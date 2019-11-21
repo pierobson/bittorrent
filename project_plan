@@ -1,0 +1,126 @@
+Bittorrent Client Project Plan    -    Pierce Robson    -    May 1, 2018
+-------------------------------------------------------------------------------
+PL:	-C++- -> Python2
+
+Key:
+	--xx-- -> Did not complete on the projected date
+
+Tuesday, May 1, 2018:
+	- Finish reading the Bittorrent unofficial spec
+	- Read through Kristen Widman's Bittorrent client tutorial
+
+
+Wednesday, May 2, 2018:
+	- Reading torrent files
+	- Connecting to tracker
+	- GET list of peers from tracker
+	--Handshake with peers--
+
+
+Thursday, May 3, 2018:
+	- Finish GET list of peers from tracker
+	- Handshake with peers
+	--Match block hash to meta pieces to inc completed blocks--
+	- Plan out/write skeleton for message passing in detail
+
+
+Friday, May 4, 2018:
+	- Begin writing meat of protocol
+	- Focus on single file torrents
+
+{
+Message Pattern:
+	- Read torrent file
+	- Send tracker request
+	- Send handshakes
+	- Begin loop (peers, active_peers, unchoked_me, unchoked_peers)
+	{
+		Parse incoming messages
+	
+		- Handshake - Check if in peers
+			- If not, send handshake
+			- Either way, add to active peers
+
+		- Interested 
+			- In active_peers?
+			- Check compact flag
+			- If compact=1, send bitfield
+			- If compact=0, send dictionary
+
+		- Not Interested
+			- Do not add to active_peers
+
+		- Bitfield
+			- Check in active_peers
+			- Add to peer's pieces
+			- Check in/can add to unchoked_peers
+			- Send unchoke to peer
+
+		- Have
+			- Check in active_peers
+			- Add single block to peer's pieces
+			- Check in/can add to unchoked_peers
+			- Send unchoke to peers
+
+		-  Choke
+			- Keep in active_peers
+			- Remove from unchoked_me
+		
+		- Unchoke
+			- Add to unchoked_me if < 6 already in unchoked_me
+			- Good to send requests to
+
+		- Request
+			- Make sure in unchoked_peers and have block
+			- Respond with Piece message of block
+	
+		- Piece
+			- Add block to piece
+			- If piece is complete, check hash
+			- If no match, discard whole piece to be rerequested
+
+		- Cancel/Port
+			- Just ignore these	
+	}
+
+	When unchoked, respond with request.
+	Respond to all pieces with another request
+
+	Unchoke 6 peers.
+	Keep track of time started and total bytes downloaded.
+	After 5s, choke slowest and unchoke a random peer.
+}
+
+
+Saturday, May 5, 2018:
+	--Finish protocol to download single file torrents--
+	--Plan out changes for multiple file torrents--
+	- Write message handling
+
+
+Sunday, May 6, 2018:
+	--Implement support for multiple file torrents--
+	- Work out downloading, keeping track of pieces, etc.
+	- Dictionary to map each file to last byte received of that file
+	- Download pieces from random file, but download each file in order
+	- Also map files to # bytes written
+	- After a write, check if length of bytes written = length of file.
+	- If wrote whole file, remove file from dictionary.
+	- Run until dictionary is empty
+	 
+
+Monday, May 7, 2018:
+	--Complete multiple file torrent supprt (last of core features)--
+	--Back-up working client--
+	--Implement 'rarest first' or 'optimistic unchoking' feature--
+	- Complete single file torrent downloading
+	- Write skeleton of handling multifile torrents
+
+
+Tuesday, May 8, 2018:
+	--Additional testing and bug fixes--
+	--Write assignment report--
+	--Submit project--
+	- Pray for an extension
+	- Implement multile torrent handling
+	- Submit project
