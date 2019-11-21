@@ -81,6 +81,7 @@ data = {}
 for f in in_progress:
     data[f] = ''
 
+# This is for testing purposes, I'll have to figure out how to properly get this started again sometime
 p = peer.Peer('192.168.2.3', 6889, torrent.num_pieces, torrent.piece_len)
 peers.append(p)
 # Map ips to peers
